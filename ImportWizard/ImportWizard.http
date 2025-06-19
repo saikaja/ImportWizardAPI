@@ -1,0 +1,6 @@
+@ImportWizard_HostAddress = http://localhost:5022
+
+GET {{ImportWizard_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,6 @@
+@ImportWizard.Repositories_HostAddress = http://localhost:5041
+
+GET {{ImportWizard.Repositories_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
