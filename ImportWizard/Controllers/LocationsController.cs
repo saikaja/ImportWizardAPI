@@ -4,7 +4,7 @@ using ImportWizard.Data;               // your DbContext namespace
 using ImportWizard.Data.Models;        // for Location entity
 using System.Linq;
 
-namespace ImportWizard.Api.Controllers
+namespace ImportWizard.WebApi.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

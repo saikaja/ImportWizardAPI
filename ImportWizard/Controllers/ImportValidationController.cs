@@ -28,7 +28,7 @@ namespace ImportWizard.WebApi.Controllers
         /// </summary>
         /// <param name="rows">The list of rows to validate.</param>
         /// <returns>A list of RowValidationResult objects indicating success or failure for each row.</returns>
-        [HttpPost("validate")]
+        [HttpPost("validateRows")]
         [ProducesResponseType(typeof(List<RowValidationResult>), 200)]
         [ProducesResponseType(400)]
         public IActionResult Validate([FromBody] List<ImportUserDto> rows)
