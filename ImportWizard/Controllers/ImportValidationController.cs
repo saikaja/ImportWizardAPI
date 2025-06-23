@@ -1,76 +1,77 @@
-﻿// ImportWizard.WebApi/Controllers/ImportValidationController.cs
+﻿// File: ImportWizard.WebApi/Controllers/ImportValidationController.cs
 
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using ImportWizard.Dtos;
+using System.Text.Json;
+using System.Threading.Tasks;
+using ImportWizard.Services.Interfaces;       // IImportValidationService
+using ImportWizard.Dtos.Validation;           // RowValidationResult
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ImportWizard.WebApi.Controllers
 {
+    /// <summary>
+    /// Binds the multipart/form-data payload: Excel file + mappings JSON.
+    /// </summary>
+    public class ValidateRowsRequest
+    {
+        [Required]
+        [FromForm(Name = "file")]
+        public IFormFile File { get; set; } = default!;
+
+        [Required]
+        [FromForm(Name = "mappings")]
+        public string Mappings { get; set; } = default!;
+
+        public Dictionary<string, string> GetMappingDictionary()
+        {
+            if (string.IsNullOrWhiteSpace(Mappings))
+                throw new InvalidOperationException("Mappings JSON is empty.");
+
+            return JsonSerializer
+                .Deserialize<Dictionary<string, string>>(Mappings)
+                ?? throw new InvalidOperationException("Unable to parse mappings JSON.");
+        }
+    }
+
     [ApiController]
     [Route("api/[controller]")]
     public class ImportValidationController : ControllerBase
     {
-        /// <summary>
-        /// Represents the validation result for a single row in the import.
-        /// </summary>
-        public class RowValidationResult
+        private readonly IImportValidationService _validationService;
+
+        public ImportValidationController(IImportValidationService validationService)
         {
-            public int Row { get; set; }
-            public bool IsValid { get; set; }
-            public string[] Errors { get; set; } = Array.Empty<string>();
+            _validationService = validationService;
         }
 
-        /// <summary>
-        /// Validate a batch of ImportUserDto rows against DataAnnotations and custom DB rules.
-        /// </summary>
-        /// <param name="rows">The list of rows to validate.</param>
-        /// <returns>A list of RowValidationResult objects indicating success or failure for each row.</returns>
         [HttpPost("validateRows")]
-        [ProducesResponseType(typeof(List<RowValidationResult>), 200)]
-        [ProducesResponseType(400)]
-        public IActionResult Validate([FromBody] List<ImportUserDto> rows)
+        [Consumes("multipart/form-data")]
+        [ProducesResponseType(typeof(List<RowValidationResult>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> ValidateRows([FromForm] ValidateRowsRequest req)
         {
-            if (rows == null || rows.Count == 0)
+            // 1) Ensure we got a file
+            if (req.File == null || req.File.Length == 0)
+                return BadRequest("No file uploaded.");
+
+            // 2) Parse mappings JSON
+            Dictionary<string, string> mappingDict;
+            try
             {
-                return BadRequest("No rows provided. Please POST a JSON array of ImportUserDto objects.");
+                mappingDict = req.GetMappingDictionary();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Unable to parse mappings JSON: {ex.Message}");
             }
 
-            var results = new List<RowValidationResult>();
+            // 3) Delegate to your service (reads Excel, maps to DTOs, runs DataAnnotations)
+            var results = await _validationService.ValidateFileAsync(req.File, mappingDict);
 
-            for (var i = 0; i < rows.Count; i++)
-            {
-                var row = rows[i];
-
-                // Build a ValidationContext that can resolve AppDbContext for DTO-level validation
-                var validationContext = new ValidationContext(
-                    instance: row,
-                    serviceProvider: HttpContext.RequestServices,
-                    items: null
-                );
-
-                var validationResults = new List<ValidationResult>();
-
-                // Runs both DataAnnotations and the IValidatableObject.Validate(...) implementation
-                var isValid = Validator.TryValidateObject(
-                    instance: row,
-                    validationContext: validationContext,
-                    validationResults: validationResults,
-                    validateAllProperties: true
-                );
-
-                results.Add(new RowValidationResult
-                {
-                    Row = i,
-                    IsValid = isValid,
-                    Errors = validationResults
-                                .Select(vr => vr.ErrorMessage!)
-                                .ToArray()
-                });
-            }
-
+            // 4) Return the list of RowValidationResult
             return Ok(results);
         }
     }

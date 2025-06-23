@@ -1,27 +1,32 @@
-﻿// Program.cs
+﻿// File: ImportWizard.WebApi/Program.cs
 
+using System;
+using System.Text;
 using ImportWizard.Data;
 using ImportWizard.Dtos.Validation;
 using ImportWizard.Repositories.Implementations;
 using ImportWizard.Repositories.Interfaces;
 using ImportWizard.Services.Implementations;
 using ImportWizard.Services.Interfaces;
-using ImportWizard.WebApi.Models;
+using ImportWizard.WebApi.Filters;         // <-- for FormFileOperationFilter
+using ImportWizard.WebApi.Models;          // <-- for ValidateRowsRequest if you need it
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;                // ← for ApiBehaviorOptions
+using Microsoft.AspNetCore.Mvc;            // for ApiBehaviorOptions
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// 1) CONFIGURE OPTIONS BINDING
 builder.Services.Configure<RolesConfig>(
     builder.Configuration.GetSection("RolesConfig"));
-
-// 1) BIND JwtSettings
-builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("Jwt"));
+builder.Services.Configure<JwtSettings>(
+    builder.Configuration.GetSection("Jwt"));
 
 // 2) ADD DbContext + Identity
 builder.Services.AddDbContext<AppDbContext>(opts =>
@@ -39,7 +44,7 @@ builder.Services
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
-// 3) CONFIGURE JWT AUTH
+// 3) CONFIGURE JWT AUTHENTICATION
 var jwtSettings = builder.Configuration.GetSection("Jwt").Get<JwtSettings>()!;
 var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Key));
 
@@ -63,7 +68,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-// 4) EXISTING REPOS & SERVICES
+// 4) REGISTER REPOSITORIES & SERVICES
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<ICategorySectionRepository, CategorySectionRepository>();
 builder.Services.AddScoped<ISectionColumnRepository, SectionColumnRepository>();
@@ -74,56 +79,58 @@ builder.Services.AddScoped<ICategorySectionService, CategorySectionService>();
 builder.Services.AddScoped<ISectionColumnService, SectionColumnService>();
 builder.Services.AddScoped<ICategoryHierarchyService, CategoryHierarchyService>();
 
-// 5) CORS, Controllers, Swagger
+// <-- Important: register your validation service
+builder.Services.AddScoped<IImportValidationService, ImportValidationService>();
+
+// 5) CORS POLICY
 builder.Services.AddCors(o => o.AddPolicy("AllowAngular", p =>
     p.WithOrigins("http://localhost:4200")
      .AllowAnyHeader()
      .AllowAnyMethod()));
 
-// ── ADD THIS to suppress automatic 400 on model‐state errors ──
+// 6) SUPPRESS AUTOMATIC 400 ON [ApiController] INVALID-MODEL
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.SuppressModelStateInvalidFilter = true;
 });
 
+// 7) CONTROLLERS + SWAGGER + OPERATION FILTER
 builder.Services.AddControllers();
+
+// Add SwaggerGen and wire up our FormFileOperationFilter
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.OperationFilter<FormFileOperationFilter>();
+});
 
 var app = builder.Build();
 
-// Create default test user if missing
+// Seed a default user if missing (dev only)
 using (var scope = app.Services.CreateScope())
 {
-    var userManager = scope.ServiceProvider
-                           .GetRequiredService<UserManager<IdentityUser>>();
+    var um = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
     const string testUser = "testuser";
     const string testPwd = "P@ssw0rd!";
-
-    if (await userManager.FindByNameAsync(testUser) == null)
-    {
-        await userManager.CreateAsync(
-            new IdentityUser { UserName = testUser },
-            testPwd
-        );
-    }
+    if (await um.FindByNameAsync(testUser) == null)
+        await um.CreateAsync(new IdentityUser { UserName = testUser }, testPwd);
 }
 
 app.UseCors("AllowAngular");
 
 if (app.Environment.IsDevelopment())
 {
-    
+    app.UseDeveloperExceptionPage();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
-app.UseSwagger();
-app.UseSwaggerUI();
+
 app.UseHttpsRedirection();
 
-// authentication → authorization
+// Authentication → Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Map all your [ApiController]s (including ImportValidationController)
 app.MapControllers();
 
 app.Run();
