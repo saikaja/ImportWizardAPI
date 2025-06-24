@@ -22,6 +22,11 @@ namespace ImportWizard.Dtos
         [StringLength(100, MinimumLength = 2, ErrorMessage = "Last Name must be between 2 and 100 characters")]
         public string LastName { get; set; } = string.Empty;
 
+        [Required(ErrorMessage = "Employee Id is required")]
+        [RegularExpression("^[A-Za-z0-9]+$", ErrorMessage = "Employee Id must be alphanumeric")]
+        [StringLength(50, ErrorMessage = "Employee Id must be at most 50 characters")]
+        public string EmployeeId { get; set; } = string.Empty;
+
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Invalid email address")]
         [StringLength(50, ErrorMessage = "Email must be at most 50 characters")]

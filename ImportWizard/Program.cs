@@ -78,9 +78,9 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ICategorySectionService, CategorySectionService>();
 builder.Services.AddScoped<ISectionColumnService, SectionColumnService>();
 builder.Services.AddScoped<ICategoryHierarchyService, CategoryHierarchyService>();
-
-// <-- Important: register your validation service
 builder.Services.AddScoped<IImportValidationService, ImportValidationService>();
+builder.Services.AddScoped<IImportResultService, ImportResultService>();
+builder.Services.AddScoped<IImportInputService, ImportInputService>();
 
 // 5) CORS POLICY
 builder.Services.AddCors(o => o.AddPolicy("AllowAngular", p =>
