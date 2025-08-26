@@ -17,7 +17,7 @@ namespace ImportWizard.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.6")
+                .HasAnnotation("ProductVersion", "9.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -108,6 +108,30 @@ namespace ImportWizard.Data.Migrations
                     b.HasKey("CompanyId");
 
                     b.ToTable("Company", "rd");
+                });
+
+            modelBuilder.Entity("ImportWizard.Data.Models.ImportMaster", b =>
+                {
+                    b.Property<int>("ImportId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ImportId"));
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("SubmittedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ImportId");
+
+                    b.ToTable("ImportMasters");
                 });
 
             modelBuilder.Entity("ImportWizard.Data.Models.Location", b =>

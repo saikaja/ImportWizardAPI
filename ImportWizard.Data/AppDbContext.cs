@@ -17,5 +17,6 @@ namespace ImportWizard.Data
         public DbSet<Company> Companies { get; set; }
         public DbSet<Location> Locations { get; set; }
         public DbSet<Template> Templates { get; set; }
+        public DbSet<ImportMaster> ImportMasters { get; set; }
     }
 }

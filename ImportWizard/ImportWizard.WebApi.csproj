@@ -30,21 +30,22 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Azure.Messaging.ServiceBus" Version="7.20.1" />
 		<PackageReference Include="ClosedXML" Version="0.105.0" />
 		<PackageReference Include="ExcelDataReader" Version="3.7.0" />
 		<PackageReference Include="ExcelDataReader.DataSet" Version="3.7.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.6" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.7" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.6">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.6" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.7" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.6">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.6" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.7" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
 	</ItemGroup>
 
@@ -52,6 +53,7 @@
 		<ProjectReference Include="..\ImportWizard.Data\ImportWizard.Data.csproj" />
 		<ProjectReference Include="..\ImportWizard.Dtos\ImportWizard.Dtos.csproj" />
 		<ProjectReference Include="..\ImportWizard.Repositories\ImportWizard.Repositories.csproj" />
+		<ProjectReference Include="..\ImportWizard.Sb\ImportWizard.Sb.csproj" />
 		<ProjectReference Include="..\ImportWizard.Services\ImportWizard.Services.csproj" />
 	</ItemGroup>
 

@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.13.35931.197
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImportWizard.WebApi", "ImportWizard\ImportWizard.WebApi.csproj", "{171285EC-CF9C-4912-994B-00E3414F97CE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3BCC448A-A3A9-40C7-8F74-8ACDEBD42C2A} = {3BCC448A-A3A9-40C7-8F74-8ACDEBD42C2A}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImportWizard.Services", "ImportWizard.Services\ImportWizard.Services.csproj", "{92D5635C-E9E5-4FE1-AF8F-122DFA46027D}"
 EndProject
@@ -12,6 +15,14 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImportWizard.Dtos", "ImportWizard.Dtos\ImportWizard.Dtos.csproj", "{930AEB3F-82B4-43A9-B8E5-C77AAD6885ED}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImportWizard.Data", "ImportWizard.Data\ImportWizard.Data.csproj", "{3C5A855C-8E65-47B5-A9C1-5C05A64724A7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImportWizard.Sb", "ImportWizard.Sb\ImportWizard.Sb.csproj", "{3BCC448A-A3A9-40C7-8F74-8ACDEBD42C2A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3C5A855C-8E65-47B5-A9C1-5C05A64724A7} = {3C5A855C-8E65-47B5-A9C1-5C05A64724A7}
+		{92D5635C-E9E5-4FE1-AF8F-122DFA46027D} = {92D5635C-E9E5-4FE1-AF8F-122DFA46027D}
+		{930AEB3F-82B4-43A9-B8E5-C77AAD6885ED} = {930AEB3F-82B4-43A9-B8E5-C77AAD6885ED}
+		{E3EAA1A7-A585-43FE-B6B8-A35B8D6F4228} = {E3EAA1A7-A585-43FE-B6B8-A35B8D6F4228}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +50,10 @@ Global
 		{3C5A855C-8E65-47B5-A9C1-5C05A64724A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C5A855C-8E65-47B5-A9C1-5C05A64724A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C5A855C-8E65-47B5-A9C1-5C05A64724A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3BCC448A-A3A9-40C7-8F74-8ACDEBD42C2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3BCC448A-A3A9-40C7-8F74-8ACDEBD42C2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3BCC448A-A3A9-40C7-8F74-8ACDEBD42C2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3BCC448A-A3A9-40C7-8F74-8ACDEBD42C2A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
